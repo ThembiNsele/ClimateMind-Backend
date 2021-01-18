@@ -32,6 +32,9 @@ class Model:
     def test(self, X_test = None, y_test = None): 
         predictions = self.predict()    
         print(predictions)
-        print("Accuracy of: ", np.mean(predictions.astype(int) == self.y_test.astype(int)))
+        print("Accuracy of: ", np.mean(predictions.astype(int) == self.y_test.astype()))
+
+        #Bining the data 
+
         return np.mean(predictions.astype(int) == self.y_test.astype(int))
 

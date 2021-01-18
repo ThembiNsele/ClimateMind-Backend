@@ -7,15 +7,19 @@ from model import Model
 
 # So far: 
 #    - Linear Regressor accuracy 0.263
-#    - LASSO accuracy 0.334
+# #    - LASSO accuracy 0.334
+# class LASSO ():
+#     pass 
+
+# class LogisticRegression():
+#     pass
 
 def main():
     
     model = Model('LASSO')
     model.train()
 
-    model.test()
-
+    print(model.test())
 
 
 
