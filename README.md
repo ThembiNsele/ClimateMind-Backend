@@ -58,7 +58,7 @@ Start the container
 
 ## Api documentation
 
-[Swagger Documentation](http://localhost:5000/swagger) is available, detailing the API endpoints and how they should be used. Whilst in development this can be found at [http://localhost:5000/swagger](http://localhost:5000/swagger).
+[Auto Documentation](http://localhost:5000/documentation) is available, detailing the API endpoints and how they should be used.
 
 ---
 
@@ -68,7 +68,7 @@ Follow these instructions to process a new version of a Climate Mind ontology OW
 
 1. Download the new OWL ontology file (if haven't already) and put it in the proper place:
     * Download the OWL ontology file by going to webprotege.stanford.edu and downloading in the format 'RDF/XML'. (If you don't have access, simply email hello@climatemind.org with your webprotege username to get access). 
-    * Unzip the download and go into the folder and move/copy the single ontology file to the folder in the climatemind-backend directory folder named 'PUT_NEW_OWL_FILE_IN_HERE'
+    * Unzip the download and go into the folder and move/copy the single ontology file to the folder in the climatemind-backend directory folder named 'PUT\_\NEW\_OWL\_FILE\_IN\_HERE'
 
 2. Change the directory to be the climatemind-backend by using the following command. The part in caps should be replaced with the path to climatemind-backend on your system (for mac):
 
@@ -82,7 +82,7 @@ Follow these instructions to process a new version of a Climate Mind ontology OW
         docker-compose up -d
     ```
     
-4. Store the docker container id as a variable by doing:
+4. If needed, you can store the docker container id as a variable by doing:
     * FOR MAC/LINUX:
     ```
         CLIMATEMIND_ID=$(docker ps -lq)
@@ -136,7 +136,7 @@ python3 process.py
 Ensure that you are in the process\_ontology folder when you run this or the command will not
 find the file.
 
-5. Check the climatemind-backend/gpickle folder. If you did this correctly, there should be a .pickle file.
+5. Check the climatemind-backend/output folder. If you did this correctly, there should be a .gpickle file.
 6. You can now run the app and it will automatically use this gpickle file.
 
 ## Backend Debugging
@@ -171,8 +171,7 @@ you can do in the [pdb documentation](https://docs.python.org/3/library/pdb.html
 
 ## Database
 [Flask migrate](https://flask-migrate.readthedocs.io/en/latest/) is used to handle database structure migrations. 
-Whenever the data model changes, you need to manually run `flask db migrate -m "Name of migration"`
-This will generate a file under `/migrations/version` which then should be checked into GIT. Whenever the API starts up, it calls `flask db upgrade`. This command will automatically apply any new migrations to the database. No manual scripts or post release commands are required!
+Updated information needed
 
 ## Extra details if the visualization script directly above was started.
 
