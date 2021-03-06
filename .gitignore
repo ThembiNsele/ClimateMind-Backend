@@ -64,3 +64,7 @@ PUT_NEW_OWL_FILE_IN_HERE/*
 
 
 *.gpickle
+
+
+#IDE
+.vscode

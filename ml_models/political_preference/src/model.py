@@ -1,13 +1,20 @@
-"""
-Implement: LASSO, Logistic Regression, and NB
-"""
+import pandas as pd 
 import numpy as np
-from sklearn.linear_model import LinearRegression, Lasso
+from sklearn.model_selection import train_test_split, cross_validate
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import Lasso, LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score
+from sklearn import metrics
+import matplotlib.pyplot as plt
 
-from data_loader import load_data
+from data_processor import *
 
-class Model:
 
+
+class Model():
+    
     def __init__ (self, classifier_type):
 
         if classifier_type == 'LASSO':
@@ -26,15 +33,16 @@ class Model:
         return self.model.fit(self.X_train, self.y_train)
 
     def predict(self, X_test = None):
-
+        """Returns predicted data"""
         return self.model.predict(self.X_test)
 
     def test(self, X_test = None, y_test = None): 
-        predictions = self.predict()    
-        print(predictions)
-        print("Accuracy of: ", np.mean(predictions.astype(int) == self.y_test.astype()))
+        """Scores model's predictions"""
+        pred = self.predict()    
+        #print(predictions)
+        # print("Accuracy of: ", np.mean(predictions.astype(int) == self.y_test.astype()))
 
         #Bining the data 
 
-        return np.mean(predictions.astype(int) == self.y_test.astype(int))
+        pass
 
