@@ -9,28 +9,45 @@ from sklearn.metrics import accuracy_score
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
-from data_processor import *
-
-
 
 class Model():
-    
-    def __init__ (self, classifier_type):
 
-        if classifier_type == 'LASSO':
+    def __init__ (self, model, training_data, test_data, verbose = False):
+        """@args model: type as a string, 
+                training_data tuple containing X,y training data
+                test_data tuple containing X,y test data"""
+
+        self.X_train = training_data[0]
+        self.y_train = training_data[1]
+        self.X_test = test_data[0]
+        self.y_test = test_data[1]
+
+        self.verbose = verbose
+
+        if model == 'LASSO':
             self.model = Lasso(alpha = 1.0) #'alpha' --> lambda value
-            print("Initating LASSO")
-        elif classifier_type == 'LinearRegression':
-            self.model = LinearRegression()
-            print("Initating Linear Regression")
 
-                                                                #QUESTION for Kameron: What path do I pass?
-        self.X_train, self.X_test, self.y_train, self.y_test = load_data("/Users/alexiscarras/Desktop/cm backend/climatemind-backend/ml_models/politcial_preference/datasets/pvq21CENTRED.csv")
+        elif model == 'NB':
+            self.model = GaussianNB()
+
+        elif model == 'RandomForest':
+            
+            print("Initialising Random Forest Classifier...\n")
+            self.model = RandomForestClassifier(max_depth=None, random_state=0)
+        else:
+            raise ValueError("Invalid model type argument")
+                                           
+        self.train()
+        self.test()
+
+    
         
     def train(self):
-
-        print("training model...")
+        print(f"Training {self.model} ...\n")
         return self.model.fit(self.X_train, self.y_train)
+
+    def validate(self):
+        pass
 
     def predict(self, X_test = None):
         """Returns predicted data"""
@@ -39,10 +56,9 @@ class Model():
     def test(self, X_test = None, y_test = None): 
         """Scores model's predictions"""
         pred = self.predict()    
-        #print(predictions)
-        # print("Accuracy of: ", np.mean(predictions.astype(int) == self.y_test.astype()))
+        print("Accuracy of: ", np.mean(pred == self.y_test))
 
-        #Bining the data 
-
+    def store_model(self):
+        #Store the model
         pass
 
