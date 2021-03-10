@@ -5,60 +5,93 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import Lasso, LogisticRegression
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn import metrics
 import matplotlib.pyplot as plt
+
+import pickle
 
 
 class Model():
 
-    def __init__ (self, model, training_data, test_data, verbose = False):
-        """@args model: type as a string, 
+
+    def __init__ (self, model, target_class, training_data, test_data, loaded_model_path = None, verbose = False):
+        """@args model: string, 
+                target_class: string (i.e. 'liberal' or 'conservative')
                 training_data tuple containing X,y training data
                 test_data tuple containing X,y test data"""
-
+        self.model_type = model
+        self.target_class = target_class
         self.X_train = training_data[0]
         self.y_train = training_data[1]
         self.X_test = test_data[0]
         self.y_test = test_data[1]
-
+        self.target_class = target_class
         self.verbose = verbose
+        self.model_accuracy = None
 
         if model == 'LASSO':
+
             self.model = Lasso(alpha = 1.0) #'alpha' --> lambda value
 
         elif model == 'NB':
+            print("Initialising Naive Bayes classifier...\n")
+
             self.model = GaussianNB()
 
         elif model == 'RandomForest':
-            
             print("Initialising Random Forest Classifier...\n")
-            self.model = RandomForestClassifier(max_depth=None, random_state=0)
-        else:
-            raise ValueError("Invalid model type argument")
-                                           
-        self.train()
-        self.test()
 
-    
+            self.model = RandomForestClassifier(max_depth=None, random_state=0)
+
+        elif model == 'Preloaded':
+            print(f"Loading preloaded {target_class} model from {loaded_model_path}...\n")
+
+            self.model = pickle.load(open(loaded_model_path, 'rb'))
+
+        else:
+            raise ValueError("Invalid model type argument or missing path")
+
+        if model != 'Preloaded':   
+
+            self.train()
+
         
     def train(self):
         print(f"Training {self.model} ...\n")
+
         return self.model.fit(self.X_train, self.y_train)
 
     def validate(self):
-        pass
+        pass #ToDo
 
     def predict(self, X_test = None):
         """Returns predicted data"""
         return self.model.predict(self.X_test)
 
     def test(self, X_test = None, y_test = None): 
-        """Scores model's predictions"""
+        """Scores model's predictions. Prints Accuracy, sensitivity, & specificity"""
+
         pred = self.predict()    
-        print("Accuracy of: ", np.mean(pred == self.y_test))
+        self.model_accuracy = np.mean(pred == self.y_test)
+        # print("Custom measure of (?) Accuracy: ", self.model_accuracy, "\n")
+
+        def sensitivity(TP, FN):
+            return (TP/(TP+FN))
+
+        def specificity(TN, FP):
+            return (TN/(TN+FP))
+
+        tn, fp, fn, tp = metrics.confusion_matrix(self.y_test, pred).ravel()
+
+        print("Accuracy: ", accuracy_score(self.y_test, pred, "\n"))
+        print("Sensitivity: ", sensitivity(tp, fn), "\n")
+        print("Specificity: ", specificity(tn, fp), "\n")
+
 
     def store_model(self):
-        #Store the model
-        pass
+
+        file_name = "../models/" + self.model_type + "_" + self.target_class + "_" + str(round(self.model_accuracy, 3)) #ATTENTION directory path differs between Mac/Win OS
+        pickle.dump(self.model, open(file_name, 'wb')) #write in binary mode
+        print("Model stored succesfully...\n")
 

@@ -1,21 +1,28 @@
 from data_processor import *
 from model import *
 import imblearn
-print("imblearn version", imblearn.__version__)
 
-    # """ Call data processor 
-    #     call DataProcessor.split() to get train and test data
-    #     Call model and pass train, test data
-    #     Call model.test"""
+#print("imblearn version", imblearn.__version__)
 
 def main():
 
-    conservative = DataProcessor("../datasets/pvq21_REVERSED_CENTRED.csv", 7)
-    X_train, X_test, y_train, y_test = conservative.split_data()
+    #Radical - conservative run
+    conservatives = DataProcessor("../datasets/pvq21_REVERSED_CENTRED.csv", 'conservative', 7)
+    X_train, X_test, y_train, y_test = conservatives.split_data()
 
-    RF_model = Model("RandomForest", (X_train, y_train), (X_test, y_test))
+    RF_con_model = Model("Preloaded", "conservative", (X_train, y_train), (X_test, y_test), "../models/RandomForest_conservative_0.739")
+    RF_con_model.test()
+    #RF_con_model.store_model()
 
-    
+    #Radical - liberal run
+    liberals = DataProcessor("../datasets/pvq21_REVERSED_CENTRED.csv", 'liberal', 3)
+    X_train, X_test, y_train, y_test = liberals.split_data()
+
+    RF_lib_model = Model("Preloaded", "liberal", (X_train, y_train), (X_test, y_test), "../models/RandomForest_liberal_0.783")
+    RF_lib_model.test()
+    #RF_lib_model.store_model()
+
+
 if __name__ == "__main__":
     main()
     

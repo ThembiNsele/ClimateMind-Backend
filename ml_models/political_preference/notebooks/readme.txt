@@ -1,1 +1,1 @@
-Notebooks used for data exploration and experimentation
+Notebooks used for data exploration and experimentation for political preference prediction
