@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split, cross_validate
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import Lasso, LogisticRegression
+from sklearn.linear_model import Lasso, LassoCV, LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn import metrics
@@ -32,7 +32,8 @@ class Model():
 
         if model == 'LASSO':
 
-            self.model = Lasso(alpha = 1.0) #'alpha' --> lambda value
+            #self.model = Lasso(alpha = 1.0) #'alpha' --> lambda value
+            self.model = LassoCV(alphas = np.arange(0, 1, 0.01), n_jobs = -1, verbose = False) #Automatic hyperparamete optimization
 
         elif model == 'NB':
             print("Initialising Naive Bayes classifier...\n")
@@ -72,6 +73,16 @@ class Model():
     def test(self, X_test = None, y_test = None): 
         """Scores model's predictions. Prints Accuracy, sensitivity, & specificity"""
 
+        if self.model_type == "LASSO":
+            print("\nScores for ", self.model_type, " predicting ", self.target_class, "\n")
+            alpha_value = self.model.alpha_
+            print("\nAlpha: ", alpha_value)
+            coeficients = self.model.coef_
+            print("Coefficients ", coeficients, "\n")
+            determination_coefficient = self.model.score(self.X_test, self.y_test)
+            print("Determination coefficient r^2: ", determination_coefficient, "\n")
+            return 1
+
         pred = self.predict()    
         self.model_accuracy = np.mean(pred == self.y_test)
         # print("Custom measure of (?) Accuracy: ", self.model_accuracy, "\n")
@@ -84,6 +95,7 @@ class Model():
 
         tn, fp, fn, tp = metrics.confusion_matrix(self.y_test, pred).ravel()
 
+        print("\nScores for ", self.model_type, " predicting ", self.target_class, "\n")
         print("Accuracy: ", accuracy_score(self.y_test, pred, "\n"))
         print("Sensitivity: ", sensitivity(tp, fn), "\n")
         print("Specificity: ", specificity(tn, fp), "\n")
