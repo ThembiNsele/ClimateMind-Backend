@@ -1,4 +1,4 @@
-import pandas as pd 
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
@@ -8,7 +8,7 @@ class DataProcessor():
     TODO:
     - implement verbocity flag [print data distributions, ]
     """
-   
+
 
     def __init__(self, dataset, target_class, lr_threshold, balance_method = None,  rank = False, verbose = False):
         super().__init__()
@@ -19,11 +19,11 @@ class DataProcessor():
         self.verbose = verbose
 
         if balance_method == 'oversample':
-            
+
             self.oversample() #Call oversampling method
 
         elif balance_method == 'undersample':
-            
+
             self.undersample() #Call undersampling method
 
         else:
@@ -31,6 +31,9 @@ class DataProcessor():
 
         rad_binned_data = self.bin_data() #get the binned radical data
 
+        # NOTE:The assumption here is that the first column is the lr score column and the rest
+        #      are feature vectors.
+        # RRR: I would do rad_binned_data.iloc[:, 1:] that is not specify
         self.X = rad_binned_data.iloc[:, 1:11] #get the attributes
         self.y = rad_binned_data.iloc[:,0] #target value
 
@@ -38,13 +41,13 @@ class DataProcessor():
 
         if rank:
             print("Ranking data...\n")
-            
+
             self.rank_data() #Call ranking method
 
     def bin_data(self):
         """@returns radical liberal dataframe & radical conservative dataframe"""
 
-        rad_to_bin_df = self.data.copy() #work on a copy of the dataset 
+        rad_to_bin_df = self.data.copy() #work on a copy of the dataset
 
         def bin_libs(lr_score):
 
@@ -71,7 +74,7 @@ class DataProcessor():
             rad_to_bin_df['lrscale'] = rad_to_bin_df['lrscale'].apply(bin_cons)
 
         return rad_to_bin_df
-        
+
     def oversample(self):
         print("Oversampling data...\n")
         #TODO
@@ -93,7 +96,10 @@ class DataProcessor():
 
             label_encoder = LabelEncoder()
             y_labeled = label_encoder.fit_transform(target_data)
-        
+
+        # RRR: This function would fail if type isn't label since y_labeled is
+        #      defined inside the if condition.
+        #      Either initialize y_labeled outside of the if condition, or set it in an else statement
         return y_labeled
 
     def decode(self, type = 'label'):

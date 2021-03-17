@@ -1,22 +1,29 @@
-import pandas as pd 
+# RRR: pandas is not used in this file
+import pandas as pd
 import numpy as np
+# RRR: Not used
 from sklearn.model_selection import train_test_split, cross_validate
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import Lasso, LassoCV, LogisticRegression
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score # RRR: not used classification_report
 from sklearn import metrics
+# RRR Not used
 import matplotlib.pyplot as plt
 
 import pickle
 
+# RRR: Why two binary models instead of:
+# 1. Regression model?
+# 2. 3 class classification - L, R, N
 
 class Model():
 
 
     def __init__ (self, model, target_class, training_data, test_data, loaded_model_path = None, verbose = False):
-        """@args model: string, 
+        """@args model: string,
                 target_class: string (i.e. 'liberal' or 'conservative')
                 training_data tuple containing X,y training data
                 test_data tuple containing X,y test data"""
@@ -53,11 +60,11 @@ class Model():
         else:
             raise ValueError("Invalid model type argument or missing path")
 
-        if model != 'Preloaded':   
+        if model != 'Preloaded':
 
             self.train()
 
-        
+
     def train(self):
         print(f"Training {self.model} ...\n")
 
@@ -70,7 +77,7 @@ class Model():
         """Returns predicted data"""
         return self.model.predict(self.X_test)
 
-    def test(self, X_test = None, y_test = None): 
+    def test(self, X_test = None, y_test = None):
         """Scores model's predictions. Prints Accuracy, sensitivity, & specificity"""
 
         if self.model_type == "LASSO":
@@ -83,7 +90,7 @@ class Model():
             print("Determination coefficient r^2: ", determination_coefficient, "\n")
             return 1
 
-        pred = self.predict()    
+        pred = self.predict()
         self.model_accuracy = np.mean(pred == self.y_test)
         # print("Custom measure of (?) Accuracy: ", self.model_accuracy, "\n")
 
@@ -103,6 +110,7 @@ class Model():
 
     def store_model(self):
 
+        # RRR: it is preferred to add a .pickle extension to the pickle file so someone knows what type it is
         file_name = "../models/" + self.model_type + "_" + self.target_class + "_" + str(round(self.model_accuracy, 3)) #ATTENTION directory path differs between Mac/Win OS
         pickle.dump(self.model, open(file_name, 'wb')) #write in binary mode
         print("Model stored succesfully...\n")
