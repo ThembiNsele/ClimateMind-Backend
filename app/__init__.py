@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
-from app.extensions import db, migrate, login, cache, auto, jwt
+from app.extensions import db, migrate, cache, auto, jwt
+from flasgger import Swagger
 
 from config import DevelopmentConfig
 
@@ -11,11 +12,17 @@ def create_app(config_class=DevelopmentConfig):
 
     db.init_app(app)
     migrate.init_app(app, db)
-    login.init_app(app)
     cache.init_app(app)
     auto.init_app(app)
     CORS(app)
     jwt.init_app(app)
+    
+    # Swagger
+    template = {
+        "swagger": "2.0",
+        "info": {"title": "ClimateMind API", "description": "", "version": "1.0"},
+    }
+    swagger = Swagger(app, template=template)
 
     with app.app_context():
 

@@ -1,0 +1,94 @@
+parameters:
+  name: session-id
+  in: path
+  type: string
+  required: true
+  default: all
+responses:
+  200:
+        description: An object containing relevant climate issues that affect the user.
+        examples:
+            application/json: {
+                "climateEffects": [
+                    {
+                        "effectDescription": "A hotter climate will mean more frequent and severe flooding, affecting all cities and land  which experience rain or are by the sea.\n\nEvery 1°F rise in average temperature allows the air to hold 4% more water. This means when it rains it can release more water than previously possible. Hurricanes become worse because not only can their clouds hold more water than before, warmer oceans allow hurricanes to become even larger with stronger wind speeds, and enables them to sit on top of cities for longer periods of time. Additionally, climate change is making our usual weather cycles more unusual and unpredictable, meaning that both dry seasons and wet seasons will be intensified. Additionally, sea level rise driven by melting ice caps is flooding coastal areas. All of these mean that once in a lifetime events like droughts, hurricanes, and floods are becoming increasingly common events, and will overwhelm our existing infrastructure.\n\nFlooding destroys both lives and property, ruins entire crops, and causes sewage and farm runoff to contaminate living areas and water supplies. The loss of clean water supplies leads to outbreaks of usually easily preventable disease, like diarrhoeal diseases which already kill around half a million children every year.\n\nMany vulnerable areas of the United States (as well as other developed countries) are seeing significant residential and commercial development despite the long-term flood risks.  Nationally, the number of Americans living in these high-flood-risk areas in 2016 climbed 14 percent compared to those living in the same neighborhoods in 2000. That’s actually faster than in areas outside of flood zones, where the population increased 13 percent. The United States is spending billions every year to move people into flood-prone areas and keep people living in flood-prone areas. Research shows upwards to 75 percent of people who live in high-risk flood areas in North America are not even aware they are at risk for flooding.\n\nIn the USA, FEMA spent approximately $48.6 billion to repair or replace public infrastructure such as roads, bridges and utilities between 1998 and 2014. The National Flood Insurance Program paid $2.9 billion per year to citizens for flood-related losses between 2007 and 2017. These costs will only rise as climate change gets more extreme. Climate scientists have estimated that by 2100 somewhere between 17 and 210 trillion dollars worth of assets will be at flood risk due to rising sea levels, requiring massive investments in flood protection to mitigate disasters annually. Not taking responsibility for our climate now means paying more in lives and resources in the future.",
+                        "effectId": "RnbPKhyIQNnShkRKHqGrGm",
+                        "effectScore": 77.44000000000001,
+                        "effectShortDescription": "The air in the atmosphere is warming, leading to more moisture held in clouds and increasing the frequency of heatwaves and warm days and nights. These cause more evaporation and extreme rainfall. Both of these, in addition to warming oceans driving stronger hurricanes with larger storm surges, are causing the continued increases in flooding of land and property.",
+                        "effectSolutions": [
+                            {
+                                "imageUrl": null,
+                                "iri": "RCxxWzxHUToYGLFTAH8Kntl",
+                                "longDescription": "Millions of Americans live in areas that are becoming increasingly more flood-prone. These areas, often near the coast or major rivers, are seen as desirable and continue to see property development despite the flood risk caused by climate change induced sea level rise and increased storm severity. \n\nBuilding outside of these floodplains can reduce the vast amounts spent on flood related destruction. This number could be up to $2.9 billion per year, which is a large quantity of capital that could be used for other causes. This solution is much easier to implement for new construction. For existing properties, government programs exist which can aid the transition to building outside floodplains. FEMA has a grant program which covers up to 75% of costs for homes to be demolished or moved.",
+                                "shortDescription": "Building on higher ground prevents flood damage to property as flooding continues to intensify due to climate change.",
+                                "solutionSources": [
+                                    "https://www.epa.gov/sites/production/files/2017-01/documents/smart_growth_fixes_climate_adaptation_resilience.pdf",
+                                    "https://www.cbc.ca/news/politics/building-on-flood-plains-goodale-1.4107474",
+                                    "https://www.governing.com/archive/flood-plains-zone-local-population-growth-data.html",
+                                    "https://www.governing.com/archive/gov-flood-zone-floodplain-development-homes-zoning.html",
+                                    "https://www.nrdc.org/stories/flooding-and-climate-change-everything-you-need-know",
+                                ],
+                                "solutionSpecificMythIRIs": [],
+                                "solutionTitle": "avoid building on land that is or will become a floodplain",
+                                "solutionType": "adaptation",
+                            },
+                            {
+                                "imageUrl": null,
+                                "iri": "RDsBA6sw2PNZOr6WuF0MvpQ",
+                                "longDescription": "Degraded lands present potential locations for tree plantations. Managed well, they can restore soil, sequester carbon, and produce wood resources in a more sustainable way. As of 2018, 294.1 million hectares of land were used for tree plantations on degraded land. Establishing tree plantations on an additional 112-174 million hectares of marginal lands can sequester 22.2-35.9 gigatons of carbon dioxide by 2050. The use of marginal lands for afforestation also indirectly avoids deforestation that otherwise would be done in the conventional system. At an initial cost of cost of $17-72 billion and lifetime operational cost of $164.8-259.5 billion to implement, this additional area of timber plantations could produce a lifetime net profit of $2.1-3.4 trillion.",
+                                "shortDescription": "Degraded lands present potential locations for tree plantations. Managed well, they can restore soil, sequester carbon and produce wood resources in a more sustainable way.",
+                                "solutionSources": [
+                                    "https://drawdown.org/solutions/tree-plantations-on-degraded-land",
+                                ],
+                                "solutionSpecificMythIRIs": [],
+                                "solutionTitle": "increase in tree plantations (on degraded land)",
+                                "solutionType": "mitigation",
+                            },
+                            {
+                                "imageUrl": null,
+                                "iri": "R8ECf0I0zdW2MwEbGGbcBdK",
+                                "longDescription": "Engaging with your local elected representatives about supporting climate-friendly policy is a great way to positively affect climate change. Databases such as Common Cause provide easy access to finding your representatives. Once identified, there are many ways to go about getting your voice heard. Sending a personalized email, calling their office, or showing up to an organized event are all effective communication strategies. In addition to curated information from places like The Climate Reality Project, including personal anecdotes is a great way to connect with representatives and inspire them to push forward favorable climate legislation.",
+                                "shortDescription": "Contact your local elected representative to encourage them to support climate-friendly policies and laws.",
+                                "solutionSources": [
+                                    "https://sciencing.com/how-to-contact-your-representative-about-climate-change-13714007.html",
+                                    "https://www.climaterealityproject.org/content/make-call",
+                                    "https://www.commoncause.org/find-your-representative",
+                                ],
+                                "solutionSpecificMythIRIs": [],
+                                "solutionTitle": "call representative",
+                                "solutionType": "mitigation",
+                            },
+                            {
+                                "imageUrl": null,
+                                "iri": "RDXACa7DGh7OTyB1o1roCZO",
+                                "longDescription": "Almost all temperate forests have been altered in some way—timbered, converted to agriculture, disrupted by development. Restoring them sequesters carbon in biomass and soil. Project Drawdown projects that temperate forest restoration will expand to an additional 92-128 million hectares through protecting currently degraded land and allowing natural regrowth to occur. Though this is much lower than the available area for tropical forest restoration, it still sequesters 19.4-27.9 gigatons of carbon dioxide by 2050.",
+                                "shortDescription": "Almost all temperate forests have been altered in some way—timbered, converted to agriculture, disrupted by development. Restoring them sequesters carbon in biomass and soil.",
+                                "solutionSources": [
+                                    "https://drawdown.org/solutions/temperate-forest-restoration",
+                                ],
+                                "solutionSpecificMythIRIs": [],
+                                "solutionTitle": "increase in restoration of temperate forests",
+                                "solutionType": "mitigation",
+                            }
+                        ],
+                        "effectSources": [
+                            "https://www.pnas.org/content/111/9/3292",
+                            "https://grist.org/article/californias-next-megaflood-would-be-worse-than-eight-hurricane-katrinas",
+                            "https://insideclimatenews.org/news/02062020/extreme-rain-study-climate-change",
+                            "https://www.governing.com/archive/gov-flood-zone-floodplain-development-homes-zoning.html",
+                            "https://www.unenvironment.org/news-and-stories/story/how-climate-change-making-record-breaking-floods-new-normal",
+                            "https://www.c2es.org/content/extreme-weather-and-climate-change",
+                            "https://www.cbc.ca/news/politics/building-on-flood-plains-goodale-1.4107474",
+                            "http://www.mcrg.ac.in/rw%20files/RW51_52/RW51_52.pdf#page=155",
+                            "https://www.sciencedirect.com/science/article/pii/S0962629807000601",
+                            "https://www.nytimes.com/2019/07/11/climate/hurricane-tropical-storms.html",
+                            "https://www.nature.com/articles/s41612-019-0074-8",
+                            "http://medialibrary.climatecentral.org/resources/hurricanes-climate-change-2017",
+                        ],
+                        "effectSpecificMythIRIs": [],
+                        "effectTitle": "increase in flooding of land and property",
+                        "imageUrl": "https://i.imgur.com/rMQRozA.jpg",
+                        "isPossiblyLocal": 1,
+                    },
+                ]
+            }

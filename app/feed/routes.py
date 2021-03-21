@@ -1,15 +1,15 @@
 from flask import jsonify, request
 from app.scoring import bp
 from app.scoring.score_nodes import score_nodes
+from flasgger import swag_from
 
 from app.models import Scores
 
 from app import db, auto, cache
 import uuid
-
-
+        
 @bp.route("/feed", methods=["GET"])
-@auto.doc()
+@swag_from("docs/feed.yml")
 def get_feed():
     """
     The front-end needs to request personalized climate change effects that are most
