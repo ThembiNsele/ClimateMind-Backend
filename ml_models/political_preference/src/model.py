@@ -1,23 +1,20 @@
-# RRR: pandas is not used in this file
-import pandas as pd
-import numpy as np
-# RRR: Not used
-from sklearn.model_selection import train_test_split, cross_validate
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
-
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import Lasso, LassoCV, LogisticRegression
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score # RRR: not used classification_report
+from sklearn.metrics import accuracy_score 
 from sklearn import metrics
-# RRR Not used
-import matplotlib.pyplot as plt
-
 import pickle
 
 # RRR: Why two binary models instead of:
 # 1. Regression model?
+""" ALEXIS RESPONSE: Data contains mostly center/neutral political orientation instances. During our first attempts (admittedly)
+without balancing the data the model was learning to predict mostly values 4 - 5.5. We are mostly concerned about radical people so the 
+'radical binning' approach seemed to guarantee predicting those instances.
+ """
 # 2. 3 class classification - L, R, N
+"""Good point and definitely something to look into. At this point the double binary classification implementation just simplified the task
+and made it easier to train baseline models with decent scores while focusing on the radical instances
+Do you think there is something wrong with this approach? """
 
 class Model():
 
@@ -110,8 +107,7 @@ class Model():
 
     def store_model(self):
 
-        # RRR: it is preferred to add a .pickle extension to the pickle file so someone knows what type it is
-        file_name = "../models/" + self.model_type + "_" + self.target_class + "_" + str(round(self.model_accuracy, 3)) #ATTENTION directory path differs between Mac/Win OS
+        file_name = "../models/" + self.model_type + "_" + self.target_class + "_" + str(round(self.model_accuracy, 3) + ".pickle") #ATTENTION directory path differs between Mac/Win OS
         pickle.dump(self.model, open(file_name, 'wb')) #write in binary mode
         print("Model stored succesfully...\n")
 

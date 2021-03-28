@@ -90,16 +90,16 @@ class DataProcessor():
 
     def encode(self, target_data, type = 'label'):
         """@returns encoded target data"""
-
         #label and one hot encode, for MVP just label encoding
         if type == 'label':
 
             label_encoder = LabelEncoder()
             y_labeled = label_encoder.fit_transform(target_data)
+        else:
+            #ToDo: implement alternative to label encoding
+            label_encoder = LabelEncoder()
+            y_labeled = label_encoder.fit_transform(target_data)
 
-        # RRR: This function would fail if type isn't label since y_labeled is
-        #      defined inside the if condition.
-        #      Either initialize y_labeled outside of the if condition, or set it in an else statement
         return y_labeled
 
     def decode(self, type = 'label'):
