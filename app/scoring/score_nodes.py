@@ -15,6 +15,7 @@ from app.feed.store_climate_feed_data import store_climate_feed_data
 
 from app.scoring.build_localised_acyclic_graph import build_localised_acyclic_graph
 import numpy as np
+import sklearn
 import random
 from collections import OrderedDict
 
@@ -67,6 +68,20 @@ class score_nodes:
             self.USER_SCORES["universalism"],
         ]
 
+    def get_scores_for_ml(self):
+        return [[
+            self.USER_SCORES["universalism"],
+            self.USER_SCORES["achievement"],
+            self.USER_SCORES["benevolence"],
+            self.USER_SCORES["self_direction"],
+            self.USER_SCORES["stimulation"],
+            self.USER_SCORES["hedonism"],
+            self.USER_SCORES["power"],
+            self.USER_SCORES["security"],
+            self.USER_SCORES["conformity"],
+            self.USER_SCORES["tradition"],
+        ]]
+
     def simple_scoring(self):
         """Each climate effects node will have personal values associated with it. These
         values are stored as a vector within the node. This vector is run through the
@@ -75,6 +90,17 @@ class score_nodes:
         """
         climate_effects = []
         user_scores_vector = np.array(self.get_scores_vector())
+
+
+        # ML
+        ml_scores = self.get_scores_for_ml()
+        liberal_model = pickle.load(open("RandomForest_liberal_0.783", 'rb'))
+        print(liberal_model.predict(ml_scores))
+
+        conservative_model = pickle.load(open("RandomForest_conservative_0.739", 'rb'))
+        print(conservative_model.predict(ml_scores))
+        # /ML
+
         modified_user_scores_vector = np.power(user_scores_vector, self.ALPHA)
         localised_acyclic_graph = build_localised_acyclic_graph(
             self.G, self.SESSION_UUID
