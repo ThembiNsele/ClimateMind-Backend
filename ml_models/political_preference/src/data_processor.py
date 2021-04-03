@@ -32,13 +32,13 @@ class DataProcessor():
         rad_binned_data = self.bin_data() #get the binned radical data
 
         # NOTE:The assumption here is that the first column is the lr score column and the rest
-        #      are feature vectors.
+        #      are feature vectors. Last column (12) is average score and is also ignored
         self.X = rad_binned_data.iloc[:, 1:11] #get the attributes
         self.y = rad_binned_data.iloc[:,0] #target value
+        #
+        self.X = self.X.reindex(sorted(self.X.columns), axis=1)
 
-        print("data x")
-        print(type(self.X))
-
+        #alphabetise attributes
         self.y = self.encode(self.y)
 
         if rank:
@@ -90,6 +90,7 @@ class DataProcessor():
         print("Ranking data...\n")
         pass #TODO
 
+###### NO NEED FOR ENCODING SO REMOVE
     def encode(self, target_data, type = 'label'):
         """@returns encoded target data"""
         #label and one hot encode, for MVP just label encoding
@@ -107,6 +108,8 @@ class DataProcessor():
     def decode(self, type = 'label'):
         #label and one-hot decode, for MVP just label decoding
         pass #TODO
+
+########################
 
     def split_data(self, split = 0.2):
         """returns data split in training and test """
