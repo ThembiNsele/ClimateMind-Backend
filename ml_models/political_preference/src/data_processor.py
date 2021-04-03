@@ -36,6 +36,9 @@ class DataProcessor():
         self.X = rad_binned_data.iloc[:, 1:11] #get the attributes
         self.y = rad_binned_data.iloc[:,0] #target value
 
+        print("data x")
+        print(type(self.X))
+
         self.y = self.encode(self.y)
 
         if rank:
