@@ -174,7 +174,7 @@ def build_localised_acyclic_graph(G, session_uuid):
 
 
 def add_lrf_data_to_graph(graph, dict):
-    graph_attributes = nx.get_node_attributes(graph, "all classes")
+    # graph_attributes = nx.get_node_attributes(graph, "all classes")
 
     lrf_to_iri_dict = {}
     for node in graph.nodes:
