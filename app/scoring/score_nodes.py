@@ -68,20 +68,6 @@ class score_nodes:
             self.USER_SCORES["universalism"],
         ]
 
-    def get_scores_for_ml(self):
-        return [[
-            self.USER_SCORES["universalism"],
-            self.USER_SCORES["achievement"],
-            self.USER_SCORES["benevolence"],
-            self.USER_SCORES["self_direction"],
-            self.USER_SCORES["stimulation"],
-            self.USER_SCORES["hedonism"],
-            self.USER_SCORES["power"],
-            self.USER_SCORES["security"],
-            self.USER_SCORES["conformity"],
-            self.USER_SCORES["tradition"],
-        ]]
-
     def simple_scoring(self):
         """Each climate effects node will have personal values associated with it. These
         values are stored as a vector within the node. This vector is run through the
@@ -91,14 +77,13 @@ class score_nodes:
         climate_effects = []
         user_scores_vector = np.array(self.get_scores_vector())
 
-
         # ML
-        ml_scores = self.get_scores_for_ml()
-        liberal_model = pickle.load(open("RandomForest_liberal_0.783", 'rb'))
-        print(liberal_model.predict(ml_scores))
+        ml_scores = [user_scores_vector]
+        liberal_model = pickle.load(open("RandomForest_liberal_0.785", "rb"))
+        user_liberal = liberal_model.predict(ml_scores)
 
-        conservative_model = pickle.load(open("RandomForest_conservative_0.739", 'rb'))
-        print(conservative_model.predict(ml_scores))
+        conservative_model = pickle.load(open("RandomForest_conservative_0.738", "rb"))
+        user_conservative = conservative_model.predict(ml_scores)
         # /ML
 
         modified_user_scores_vector = np.power(user_scores_vector, self.ALPHA)
@@ -108,6 +93,13 @@ class score_nodes:
 
         for node in self.G.nodes:
             current_node = self.G.nodes[node]
+            if "political_value" in current_node:
+                node_conservative = current_node["political_value"][0]
+                node_liberal = current_node["political_value"][1]
+                if user_liberal and node_conservative:
+                    continue
+                if user_conservative and node_liberal:
+                    continue
             if "personal_values_10" in current_node and any(
                 current_node["personal_values_10"]
             ):

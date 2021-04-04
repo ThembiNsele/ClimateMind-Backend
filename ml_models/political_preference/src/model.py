@@ -1,7 +1,7 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import Lasso, LassoCV, LogisticRegression
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score 
+from sklearn.metrics import accuracy_score
 from sklearn import metrics
 import pickle
 import numpy as np
@@ -17,14 +17,21 @@ without balancing the data the model was learning to predict mostly values 4 - 5
 and made it easier to train baseline models with decent scores while focusing on the radical instances
 Do you think there is something wrong with this approach? """
 
-class Model():
 
-
-    def __init__ (self, model, target_class, training_data, test_data, loaded_model_path = None, verbose = False):
+class Model:
+    def __init__(
+        self,
+        model,
+        target_class,
+        training_data,
+        test_data,
+        loaded_model_path=None,
+        verbose=False,
+    ):
         """@args model: string,
-                target_class: string (i.e. 'liberal' or 'conservative')
-                training_data tuple containing X,y training data
-                test_data tuple containing X,y test data"""
+        target_class: string (i.e. 'liberal' or 'conservative')
+        training_data tuple containing X,y training data
+        test_data tuple containing X,y test data"""
         self.model_type = model
         self.target_class = target_class
         self.X_train = training_data[0]
@@ -35,33 +42,36 @@ class Model():
         self.verbose = verbose
         self.model_accuracy = None
 
-        if model == 'LASSO':
+        if model == "LASSO":
 
-            #self.model = Lasso(alpha = 1.0) #'alpha' --> lambda value
-            self.model = LassoCV(alphas = np.arange(0, 1, 0.01), n_jobs = -1, verbose = False) #Automatic hyperparamete optimization
+            # self.model = Lasso(alpha = 1.0) #'alpha' --> lambda value
+            self.model = LassoCV(
+                alphas=np.arange(0, 1, 0.01), n_jobs=-1, verbose=False
+            )  # Automatic hyperparameter optimization
 
-        elif model == 'NB':
+        elif model == "NB":
             print("Initialising Naive Bayes classifier...\n")
 
             self.model = GaussianNB()
 
-        elif model == 'RandomForest':
+        elif model == "RandomForest":
             print("Initialising Random Forest Classifier...\n")
 
             self.model = RandomForestClassifier(max_depth=None, random_state=0)
 
-        elif model == 'Preloaded':
-            print(f"Loading preloaded {target_class} model from {loaded_model_path}...\n")
+        elif model == "Preloaded":
+            print(
+                f"Loading preloaded {target_class} model from {loaded_model_path}...\n"
+            )
 
-            self.model = pickle.load(open(loaded_model_path, 'rb'))
+            self.model = pickle.load(open(loaded_model_path, "rb"))
 
         else:
             raise ValueError("Invalid model type argument or missing path")
 
-        if model != 'Preloaded':
+        if model != "Preloaded":
 
             self.train()
-
 
     def train(self):
         print(f"Training {self.model} ...\n")
@@ -69,13 +79,13 @@ class Model():
         return self.model.fit(self.X_train, self.y_train)
 
     def validate(self):
-        pass #ToDo
+        pass  # ToDo
 
-    def predict(self, X_test = None):
+    def predict(self, X_test=None):
         """Returns predicted data"""
         return self.model.predict(self.X_test)
 
-    def test(self, X_test = None, y_test = None):
+    def test(self, X_test=None, y_test=None):
         """Scores model's predictions. Prints Accuracy, sensitivity, & specificity"""
 
         if self.model_type == "LASSO":
@@ -87,11 +97,13 @@ class Model():
             determination_coefficient = self.model.score(self.X_test, self.y_test)
             print("Determination coefficient r^2: ", determination_coefficient, "\n")
 
+
             preds = self.predict()          
             preds = [round(pred) for pred in preds]#Using LASSO as a classifier
             self.model_accuracy = np.mean(preds == self.y_test)
             print("\nScores for ", self.model_type, " predicting ", self.target_class, "\n")
             print(self.model_accuracy)
+
 
             return 1
 
@@ -99,10 +111,10 @@ class Model():
         self.model_accuracy = np.mean(preds == self.y_test)
 
         def sensitivity(TP, FN):
-            return (TP/(TP+FN))
+            return TP / (TP + FN)
 
         def specificity(TN, FP):
-            return (TN/(TN+FP))
+            return TN / (TN + FP)
 
         tn, fp, fn, tp = metrics.confusion_matrix(self.y_test, preds).ravel()
 
@@ -111,10 +123,16 @@ class Model():
         print("Sensitivity: ", sensitivity(tp, fn), "\n")
         print("Specificity: ", specificity(tn, fp), "\n")
 
-
     def store_model(self):
 
-        file_name = "ml_models/political_preference/models/" + self.model_type + "_" + self.target_class + "_" + str(round(self.model_accuracy, 3)) + ".pickle" 
-        pickle.dump(self.model, open(file_name, 'wb')) #write in binary mode
+        file_name = (
+            "ml_models/political_preference/models/"
+            + self.model_type
+            + "_"
+            + self.target_class
+            + "_"
+            + str(round(self.model_accuracy, 3))
+            + ".pickle"
+        )
+        pickle.dump(self.model, open(file_name, "wb"))  # write in binary mode
         print("Model stored succesfully!\n")
-
