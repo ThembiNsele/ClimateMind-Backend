@@ -79,7 +79,7 @@ class Model():
         """Scores model's predictions. Prints Accuracy, sensitivity, & specificity"""
 
         if self.model_type == "LASSO":
-            print("\nScores for ", self.model_type, " predicting ", self.target_class, "\n")
+
             alpha_value = self.model.alpha_
             print("\nAlpha: ", alpha_value)
             coeficients = self.model.coef_
@@ -87,8 +87,12 @@ class Model():
             determination_coefficient = self.model.score(self.X_test, self.y_test)
             print("Determination coefficient r^2: ", determination_coefficient, "\n")
 
-            preds = self.predict()          #Using LASSO as a classifier
-            self.model_accuracy = np.mean(round(preds) == self.y_test)
+            preds = self.predict()          
+            preds = [round(pred) for pred in preds]#Using LASSO as a classifier
+            self.model_accuracy = np.mean(preds == self.y_test)
+            print("\nScores for ", self.model_type, " predicting ", self.target_class, "\n")
+            print(self.model_accuracy)
+
             return 1
 
         preds = self.predict()
