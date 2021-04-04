@@ -4,10 +4,11 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score 
 from sklearn import metrics
 import pickle
+import numpy as np
 
 # RRR: Why two binary models instead of:
 # 1. Regression model?
-""" ALEXIS RESPONSE: Data contains mostly center/neutral political orientation instances. During our first attempts (admittedly)
+""" Data contains mostly center/neutral political orientation instances. During our first attempts (admittedly)
 without balancing the data the model was learning to predict mostly values 4 - 5.5. We are mostly concerned about radical people so the 
 'radical binning' approach seemed to guarantee predicting those instances.
  """
@@ -85,11 +86,13 @@ class Model():
             print("Coefficients ", coeficients, "\n")
             determination_coefficient = self.model.score(self.X_test, self.y_test)
             print("Determination coefficient r^2: ", determination_coefficient, "\n")
+
+            preds = self.predict()          #Using LASSO as a classifier
+            self.model_accuracy = np.mean(round(preds) == self.y_test)
             return 1
 
-        pred = self.predict()
-        self.model_accuracy = np.mean(pred == self.y_test)
-        # print("Custom measure of (?) Accuracy: ", self.model_accuracy, "\n")
+        preds = self.predict()
+        self.model_accuracy = np.mean(preds == self.y_test)
 
         def sensitivity(TP, FN):
             return (TP/(TP+FN))
@@ -97,17 +100,17 @@ class Model():
         def specificity(TN, FP):
             return (TN/(TN+FP))
 
-        tn, fp, fn, tp = metrics.confusion_matrix(self.y_test, pred).ravel()
+        tn, fp, fn, tp = metrics.confusion_matrix(self.y_test, preds).ravel()
 
         print("\nScores for ", self.model_type, " predicting ", self.target_class, "\n")
-        print("Accuracy: ", accuracy_score(self.y_test, pred, "\n"))
+        print("Accuracy: ", accuracy_score(self.y_test, preds, "\n"))
         print("Sensitivity: ", sensitivity(tp, fn), "\n")
         print("Specificity: ", specificity(tn, fp), "\n")
 
 
     def store_model(self):
 
-        file_name = "../models/" + self.model_type + "_" + self.target_class + "_" + str(round(self.model_accuracy, 3) + ".pickle") #ATTENTION directory path differs between Mac/Win OS
+        file_name = "ml_models/political_preference/models/" + self.model_type + "_" + self.target_class + "_" + str(round(self.model_accuracy, 3)) + ".pickle" 
         pickle.dump(self.model, open(file_name, 'wb')) #write in binary mode
-        print("Model stored succesfully...\n")
+        print("Model stored succesfully!\n")
 

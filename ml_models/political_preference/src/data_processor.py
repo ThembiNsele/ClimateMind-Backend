@@ -35,11 +35,13 @@ class DataProcessor():
         #      are feature vectors. Last column (12) is average score and is also ignored
         self.X = rad_binned_data.iloc[:, 1:11] #get the attributes
         self.y = rad_binned_data.iloc[:,0] #target value
-        #
-        self.X = self.X.reindex(sorted(self.X.columns), axis=1)
+
 
         #alphabetise attributes
-        self.y = self.encode(self.y)
+        self.X = self.X.reindex(sorted(self.X.columns), axis=1)
+
+        
+        #self.y = self.encode(self.y)
 
         if rank:
             print("Ranking data...\n")
@@ -90,26 +92,26 @@ class DataProcessor():
         print("Ranking data...\n")
         pass #TODO
 
-###### NO NEED FOR ENCODING SO REMOVE
-    def encode(self, target_data, type = 'label'):
-        """@returns encoded target data"""
-        #label and one hot encode, for MVP just label encoding
-        if type == 'label':
+# ###### NO NEED FOR ENCODING SO REMOVE
+#     def encode(self, target_data, type = 'label'):
+#         """@returns encoded target data"""
+#         #label and one hot encode, for MVP just label encoding
+#         if type == 'label':
 
-            label_encoder = LabelEncoder()
-            y_labeled = label_encoder.fit_transform(target_data)
-        else:
-            #ToDo: implement alternative to label encoding
-            label_encoder = LabelEncoder()
-            y_labeled = label_encoder.fit_transform(target_data)
+#             label_encoder = LabelEncoder()
+#             y_labeled = label_encoder.fit_transform(target_data)
+#         else:
+#             #ToDo: implement alternative to label encoding
+#             label_encoder = LabelEncoder()
+#             y_labeled = label_encoder.fit_transform(target_data)
 
-        return y_labeled
+#         return y_labeled
 
-    def decode(self, type = 'label'):
-        #label and one-hot decode, for MVP just label decoding
-        pass #TODO
+#     def decode(self, type = 'label'):
+#         #label and one-hot decode, for MVP just label decoding
+#         pass #TODO
 
-########################
+# ########################
 
     def split_data(self, split = 0.2):
         """returns data split in training and test """
