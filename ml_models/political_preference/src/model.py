@@ -2,6 +2,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import Lasso, LassoCV, LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold, cross_validate
 from sklearn import metrics
 import pickle
 import numpy as np
@@ -75,11 +76,14 @@ class Model:
 
     def train(self):
         print(f"Training {self.model} ...\n")
-
         return self.model.fit(self.X_train, self.y_train)
+        
+            
 
-    def validate(self):
-        pass  # ToDo
+
+    def validate(self,k=10):
+        cv_results = cross_validate(self.model, self.X_train, self.y_train, k)
+        #ToDo: return results, add possibility for hyperparameter tweaking
 
     def predict(self, X_test=None):
         """Returns predicted data"""

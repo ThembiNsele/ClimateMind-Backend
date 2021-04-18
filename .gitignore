@@ -68,7 +68,7 @@ climate_mind_ontology
 
 *.owl
 *.gpickle
-
+ideas.txt
 
 #node/cypress
 /node_modules
