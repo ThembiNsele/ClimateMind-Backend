@@ -75,3 +75,5 @@ climate_mind_ontology
 /cypress/videos
 
 .vscode
+venv/
+ideas.txt
