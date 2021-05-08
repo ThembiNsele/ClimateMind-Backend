@@ -59,6 +59,11 @@ docs/_build/
 *.pyc
  /.idea/
 
+# Vscode stuff
+.vscode
+
+venv
+
 #updated ontology files
 Climate_Mind_Digraph_Test_Ont.json
 Climate_Mind_DiGraph.gpickle
@@ -74,4 +79,5 @@ climate_mind_ontology
 /node_modules
 /cypress/videos
 
-.vscode
+
+

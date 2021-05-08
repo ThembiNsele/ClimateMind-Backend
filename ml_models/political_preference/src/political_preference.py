@@ -4,34 +4,51 @@ from model import *
 
 # print("imblearn version", imblearn.__version__)
 
+RANK = True
+BALANCE = "oversampling"
+MODEL = "NaiveBayes"
 
 def main():
 
     # Radical-conservative run
     conservatives = DataProcessor(
-        "ml_models/political_preference/datasets/pvq21_REVERSED_CENTRED.csv",
+        "../datasets/ESS/ess_8-9_merged.csv",
         "conservative",
-        7,
+        6, 
+        rank=RANK
     )
     X_train, X_test, y_train, y_test = conservatives.split_data()
 
-    RF_con_model = Model("LASSO", "conservative", (X_train, y_train), (X_test, y_test))
+    if BALANCE == "oversampling":
+        X_train, y_train = conservatives.oversample(X_train, y_train)
+    elif BALANCE == "undersampling":
+        X_train, y_train = conservatives.undersample(X_train, y_train)
 
+    RF_con_model = Model(MODEL, "conservative", (X_train, y_train), (X_test, y_test), loaded_model_path="../models/RandomForest_conservative_0.738.pickle") #returns a trained model
+
+    #print(RF_con_model.validate())
     RF_con_model.test()
-    #RF_con_model.store_model()
+    RF_con_model.store_model(directory="../models/")
 
     # Radical-liberal run
     liberals = DataProcessor(
-        "ml_models/political_preference/datasets/pvq21_REVERSED_CENTRED.csv",
+        "../datasets/ESS/ess_8-9_merged.csv",
         "liberal",
-        3,
+        4, 
+        rank=RANK
     )
     X_train, X_test, y_train, y_test = liberals.split_data()
 
-    RF_lib_model = Model("LASSO", "liberal", (X_train, y_train), (X_test, y_test))
+    if BALANCE == "oversampling":
+            X_train, y_train = conservatives.oversample(X_train, y_train)
+    elif BALANCE == "undersampling":
+        X_train, y_train = conservatives.undersample(X_train, y_train)
 
+    RF_lib_model = Model(MODEL, "Pretrained", (X_train, y_train), (X_test, y_test), loaded_model_path="../models/RandomForest_liberal_0.785.pickle")
+
+    #RF_lib_model.validate()
     RF_lib_model.test()
-    #RF_lib_model.store_model()
+    RF_lib_model.store_model(directory="../models/")
 
 
 if __name__ == "__main__":

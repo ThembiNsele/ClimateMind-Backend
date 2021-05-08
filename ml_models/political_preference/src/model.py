@@ -47,10 +47,10 @@ class Model:
 
             # self.model = Lasso(alpha = 1.0) #'alpha' --> lambda value
             self.model = LassoCV(
-                alphas=np.arange(0, 1, 0.01), n_jobs=-1, verbose=False
+                alphas=np.arange(0.0005, 1, 0.01), n_jobs=-1, verbose=False
             )  # Automatic hyperparameter optimization
 
-        elif model == "NB":
+        elif model == "NaiveBayes":
             print("Initialising Naive Bayes classifier...\n")
 
             self.model = GaussianNB()
@@ -58,11 +58,11 @@ class Model:
         elif model == "RandomForest":
             print("Initialising Random Forest Classifier...\n")
 
-            self.model = RandomForestClassifier(max_depth=None, random_state=0)
+            self.model = RandomForestClassifier(max_depth=25, random_state=0)
 
-        elif model == "Preloaded":
+        elif model == "Pretrained":
             print(
-                f"Loading preloaded {target_class} model from {loaded_model_path}...\n"
+                f"Loading pretrained model from {loaded_model_path}...\n"
             )
 
             self.model = pickle.load(open(loaded_model_path, "rb"))
@@ -74,15 +74,14 @@ class Model:
 
             self.train()
 
-    def train(self):
+    def train(self): #,X=self.X_train, y=self.y_train):
         print(f"Training {self.model} ...\n")
         return self.model.fit(self.X_train, self.y_train)
         
             
-
-
     def validate(self,k=10):
-        cv_results = cross_validate(self.model, self.X_train, self.y_train, k)
+        cv_results = cross_validate(self.model, self.X_train, self.y_train, scoring=['accuracy', 'f1', 'precision', 'recall'])
+        return cv_results
         #ToDo: return results, add possibility for hyperparameter tweaking
 
     def predict(self, X_test=None):
@@ -108,11 +107,11 @@ class Model:
             print("\nScores for ", self.model_type, " predicting ", self.target_class, "\n")
             print(self.model_accuracy)
 
+            
+        else:
 
-            return 1
-
-        preds = self.predict()
-        self.model_accuracy = np.mean(preds == self.y_test)
+            preds = self.predict()
+            self.model_accuracy = np.mean(preds == self.y_test)
 
         def sensitivity(TP, FN):
             return TP / (TP + FN)
@@ -127,10 +126,10 @@ class Model:
         print("Sensitivity: ", sensitivity(tp, fn), "\n")
         print("Specificity: ", specificity(tn, fp), "\n")
 
-    def store_model(self):
+    def store_model(self, directory):
 
         file_name = (
-            "ml_models/political_preference/models/"
+            directory
             + self.model_type
             + "_"
             + self.target_class

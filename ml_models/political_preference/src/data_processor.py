@@ -1,6 +1,10 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from imblearn.under_sampling import RandomUnderSampler, TomekLinks
+from imblearn.over_sampling import RandomOverSampler
+
+from collections import Counter
 
 
 class DataProcessor:
@@ -50,9 +54,8 @@ class DataProcessor:
         # self.y = self.encode(self.y)
 
         if rank:
-            print("Ranking data...\n")
 
-            self.rank_data()  # Call ranking method
+            self.data = self.rank_data()  # Call ranking method
 
     def bin_data(self):
         """@returns radical liberal dataframe & radical conservative dataframe"""
@@ -82,46 +85,52 @@ class DataProcessor:
 
         elif self.target_class == "conservative":
             print(
-                f"\nBinning radical conservative instances with lr score <= {self.lr_threshold}\n"
+                f"\nBinning radical conservative instances with lr score >= {self.lr_threshold}\n"
             )
 
             rad_to_bin_df["lrscale"] = rad_to_bin_df["lrscale"].apply(bin_cons)
 
         return rad_to_bin_df
 
-    def oversample(self):
-        print("Oversampling data...\n")
-        # TODO
-        pass
+    def oversample(self, X, y):
 
-    def undersample(self):
+        print(f"Unbalanced counts: {Counter(y)}")
+
+        print("Oversampling data...\n")
+        random_over_sampler = RandomOverSampler(random_state=42, sampling_strategy=0.8)
+        X_over_sampled, y_over_sampled  = random_over_sampler.fit_resample(X, y)
+      
+        print(f"Balanced counts: {Counter(y_over_sampled)}")
+
+        return X_over_sampled, y_over_sampled 
+
+    def undersample(self, X, y):
+        
+        print(f"Unbalanced counts: {Counter(y)}")
+
         print("Undersampling data...\n")
-        pass  # TODO
+        random_under_sampler = TomekLinks(sampling_strategy='majority')#RandomUnderSampler(random_state=42, sampling_strategy=0.8)#
+        X_under_sampled, y_under_sampled  = random_under_sampler.fit_resample(X, y)
+      
+        print(f"Balanced counts: {Counter(y_under_sampled)}")
+
+        return X_under_sampled, y_under_sampled 
+
 
     def rank_data(self):
         print("Ranking data...\n")
-        pass  # TODO
 
-    # ###### NO NEED FOR ENCODING SO REMOVE
-    #     def encode(self, target_data, type = 'label'):
-    #         """@returns encoded target data"""
-    #         #label and one hot encode, for MVP just label encoding
-    #         if type == 'label':
+        df_copy = self.data.copy()
+        ranked_df = pd.DataFrame()
+        col_name = ''
+        for column_name, data in df_copy.iteritems():
+            for other_column_name, other_data in df_copy.iteritems():
+                if column_name != other_column_name:
+                    comp_col_name = column_name + ' < ' + other_column_name
+                    ranked_df[comp_col_name] = df_copy[column_name] < df_copy[other_column_name]
 
-    #             label_encoder = LabelEncoder()
-    #             y_labeled = label_encoder.fit_transform(target_data)
-    #         else:
-    #             #ToDo: implement alternative to label encoding
-    #             label_encoder = LabelEncoder()
-    #             y_labeled = label_encoder.fit_transform(target_data)
+        return ranked_df
 
-    #         return y_labeled
-
-    #     def decode(self, type = 'label'):
-    #         #label and one-hot decode, for MVP just label decoding
-    #         pass #TODO
-
-    # ########################
 
     def split_data(self, split=0.2):
         """returns data split in training and test """
