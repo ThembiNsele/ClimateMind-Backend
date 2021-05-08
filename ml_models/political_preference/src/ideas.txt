@@ -1,0 +1,18 @@
+for the notebooks, if I am planning to organise them consider using the following snippet
+# Cleaning up variables to prevent loading data multiple times (which may cause memory issue)
+try:
+   del X_train, y_train
+   del X_test, y_test
+   print('Clear previously loaded data.')
+except:
+   pass
+
+
+
+
+ToDo:
+
+- implement 10 fold cross validation
+- Load more datasets (probably train on the 2018 one) and additionally test generalisation on 2014 one.
+   - Do Hard Negative mining to try to get accuracy above 85% with decent Specificity and Sensitivity
+- Store improved models and test generalisation
