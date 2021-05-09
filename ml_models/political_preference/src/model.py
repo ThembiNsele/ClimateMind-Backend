@@ -24,8 +24,8 @@ class Model:
         self,
         model,
         target_class,
-        training_data,
-        test_data,
+        training_data=None,
+        test_data=None,
         loaded_model_path=None,
         verbose=False,
     ):
@@ -47,7 +47,7 @@ class Model:
 
             # self.model = Lasso(alpha = 1.0) #'alpha' --> lambda value
             self.model = LassoCV(
-                alphas=np.arange(0.0005, 1, 0.01), n_jobs=-1, verbose=False
+                alphas=np.arange(0.0, 1, 0.01), n_jobs=-1, verbose=False
             )  # Automatic hyperparameter optimization
 
         elif model == "NaiveBayes":
@@ -58,7 +58,7 @@ class Model:
         elif model == "RandomForest":
             print("Initialising Random Forest Classifier...\n")
 
-            self.model = RandomForestClassifier(max_depth=25, random_state=0)
+            self.model = RandomForestClassifier(max_depth=None, random_state=0)
 
         elif model == "Pretrained":
             print(
@@ -70,7 +70,7 @@ class Model:
         else:
             raise ValueError("Invalid model type argument or missing path")
 
-        if model != "Preloaded":
+        if model != "Pretrained":
 
             self.train()
 

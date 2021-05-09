@@ -1,0 +1,14 @@
+To further improve performance, 
+    A. Hard negative mining - training
+        Basically: Train, Test on Training data, Identify all False Negatives, Retrain on those False Negatives
+    B. A pairwise comparison which is not order sensitive (so 45 attributes instead of 90)
+
+Regarding the integrated model, implement the necessary data preprocessing steps
+
+Deal with conflicts in conservative vs liberal predictions i.e., smarter cooperation
+
+Improve documentation of this codebase and the notebooks
+
+Work on the explainability of the model. Generate some kind of feedback on why a prediction was made, to inform the user
+
+Implement user feedback that would lead to more training instances

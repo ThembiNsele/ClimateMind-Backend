@@ -23,7 +23,7 @@ class DataProcessor:
         rank=False,
         verbose=False,
     ):
-        super().__init__()
+        #super().__init__()
 
         self.data = pd.read_csv(dataset, sep=",")
         self.target_class = target_class
@@ -56,6 +56,11 @@ class DataProcessor:
         if rank:
 
             self.data = self.rank_data()  # Call ranking method
+
+        
+    def get_data(self):
+        return self.X, self.y
+
 
     def bin_data(self):
         """@returns radical liberal dataframe & radical conservative dataframe"""
