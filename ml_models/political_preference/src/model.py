@@ -86,6 +86,8 @@ class Model:
 
     def predict(self, X_test=None):
         """Returns predicted data"""
+        #print("THE ATTRIBUTES:")
+        #print(self.X_test)
         return self.model.predict(self.X_test)
 
     def test(self, X_test=None, y_test=None):
@@ -111,6 +113,11 @@ class Model:
         else:
 
             preds = self.predict()
+            ######
+            print("Predicted:")
+            print(preds)
+            print("Actual:")
+            print(self.y_test)
             self.model_accuracy = np.mean(preds == self.y_test)
 
         def sensitivity(TP, FN):

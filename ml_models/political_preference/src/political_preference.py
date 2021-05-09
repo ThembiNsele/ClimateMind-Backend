@@ -5,8 +5,9 @@ from model import *
 # print("imblearn version", imblearn.__version__)
 RUN = 'TEST'
 RANK = True
-BALANCE = 'undersample'
+BALANCE = 'oversample'
 MODEL = "Pretrained"
+STORE = False
 
 def main():
 
@@ -29,7 +30,7 @@ def main():
         RF_con_model.train()
         #print(RF_con_model.validate())
         RF_con_model.test()
-        #RF_con_model.store_model(directory="../models/")
+        
 
         #Radical-liberal run
         liberals = DataProcessor(
@@ -45,11 +46,14 @@ def main():
         elif BALANCE == "undersampling":
             X_train, y_train = conservatives.undersample(X_train, y_train)
 
-        RF_lib_model = Model(MODEL, "Pretrained", (X_train, y_train), (X_test, y_test), loaded_model_path="../models/NaiveBayes_liberal_0.641.pickle")
+        RF_lib_model = Model(MODEL, "liberal", (X_train, y_train), (X_test, y_test), loaded_model_path="../models/NaiveBayes_liberal_0.641.pickle")
 
         #RF_lib_model.validate()
         RF_lib_model.test()
-        #RF_lib_model.store_model(directory="../models/")
+
+        if STORE == True:
+            RF_con_model.store_model(directory="../models/")
+            RF_lib_model.store_model(directory="../models/")
 
 
     elif RUN == 'TEST':
@@ -69,7 +73,7 @@ def main():
                          "conservative", 
                         (X_test, y_test), 
                         (X_test, y_test), 
-                        loaded_model_path="../models/NaiveBayes_conservative_0.586.pickle") #returns a trained model
+                        loaded_model_path="../models/NaiveBayes_conservative_ranked_0.708.pickle") #returns a trained model
 
         con_model.test()
         ######## LIBERAL PREDICTION RUN ########
@@ -87,7 +91,7 @@ def main():
                         "liberal", 
                         (X_test, y_test), 
                         (X_test, y_test), 
-                        loaded_model_path="../models/NaiveBayes_liberal_0.641.pickle")
+                        loaded_model_path="../models/NaiveBayes_liberal_ranked_0.569.pickle")
 
         lib_model.test()
 

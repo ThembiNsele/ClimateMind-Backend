@@ -54,9 +54,12 @@ class DataProcessor:
         # self.y = self.encode(self.y)
 
         if rank:
-
-            self.data = self.rank_data()  # Call ranking method
-
+            print("RANKING DATA:")
+            print("NON RANKED:")
+            print(self.X)
+            self.X = self.rank_data()  # Call ranking method
+            print("SHOULD BE RANKED:")
+            print(self.X)
         
     def get_data(self):
         return self.X, self.y
@@ -125,7 +128,7 @@ class DataProcessor:
     def rank_data(self):
         print("Ranking data...\n")
 
-        df_copy = self.data.copy()
+        df_copy = self.X.copy()
         ranked_df = pd.DataFrame()
         col_name = ''
         for column_name, data in df_copy.iteritems():
