@@ -1,24 +1,32 @@
+<<<<<<< HEAD
 from datetime import datetime, timezone
 from flask import request, jsonify, make_response
 from sqlalchemy import desc
 import uuid
 import regex as re
+=======
+>>>>>>> add docstrings, fix bugs
 from flask import request, jsonify, make_response
-from flask_cors import cross_origin
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import create_refresh_token
-from flask_jwt_extended import current_user
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import unset_jwt_cookies, get_jwt
-
 from sqlalchemy import desc
+from app.auth import bp
+import regex as re
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import current_user
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import create_refresh_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import unset_jwt_cookies
+from flask_jwt_extended import get_jwt
+from flask_cors import cross_origin
+from app.subscribe.store_subscription_data import check_email
+
+from app.errors.errors import InvalidUsageError, DatabaseError, UnauthorizedError
+
+from app.models import Users, Scores
 
 from app import db, auto
-from app.auth import bp
-from app.errors.errors import InvalidUsageError, DatabaseError, UnauthorizedError
-from app.models import Users, Scores
-from app.subscribe.store_subscription_data import check_email
+
+import uuid
 
 """
 A series of endpoints for authentication.
@@ -27,10 +35,9 @@ Valid URLS to access the refresh endpoint are specified in app/__init__.py
 """
 
 
-@bp.route("/login", methods=["POST", "GET"])
+@bp.route("/login", methods=["POST"])
 @auto.doc()
 def login():
-    db.session.query(Users).one()
     """
     Logs a user in by parsing a POST request containing user credentials.
     User provides email/password.
@@ -191,8 +198,8 @@ def register():
     if not password_valid(password):
         raise InvalidUsageError(
             message="Password does not fit the requirements."
-                    "Password must be between 8-20 characters and contain at least one uppercase letter, one lowercase "
-                    "letter, one number and one special character."
+            "Password must be between 8-20 characters and contain at least one uppercase letter, one lowercase "
+            "letter, one number and one special character."
         )
 
     user = Users.find_by_username(email)
@@ -223,34 +230,54 @@ def register():
     return response
 
 
-@bp.route("/internal-admin-jwt-token")
+@bp.route("/register-admin")
 def get_admin_jwt_token():
-    fakeuser = {"uuid": "12345"}
-    admin_access_token = create_access_token(identity=fakeuser, additional_claims={"is_admin": True})
+    """
+    Creates an admin account. Must not be called twice as we'll try to insert two admin users into the database.
+
+    Returns: JWT access token
+    """
+    user = add_user_to_db("admin", email="admin@admin.com", password="vEuT3!v4b4fV")
+    admin_access_token = create_access_token(
+        identity=user, additional_claims={"is_admin": True}
+    )
 
     return jsonify(admin_access_token)
 
 
-@bp.route("/delete_user")
+@bp.route("/delete-user")
 @jwt_required()
 def delete_user():
+    """
+    Deletes the user identified by the URL parameter session_uuid. Does a Join with Users and Scores to match User with
+    session_uuid.
+
+    Only admin accounts can access this endpoint
+
+    """
     if not get_jwt()["is_admin"]:
         raise UnauthorizedError("The JWT is not a valid admin JWT")
 
     delete_session_uuid = request.args.get("session_uuid")
-    delete_user = db.session.query(Users).join(Scores).filter(Scores.session_uuid == delete_session_uuid).one_or_none()
-    db.session.delete(delete_user)
-    db.session.commit()
     print("deleting ", delete_session_uuid)
+    deleteuser = (
+        db.session.query(Users)
+        .join(Scores)
+        .filter(Scores.session_uuid == delete_session_uuid)
+        .one()
+    )
+    db.session.delete(deleteuser)
+    db.session.commit()
 
 
 def get_session_id_for_user(user):
+
     try:
         scores = (
             db.session.query(Scores)
-                .filter_by(user_uuid=user.uuid)
-                .order_by(desc("scores_created_timestamp"))
-                .first()
+            .filter_by(user_uuid=user.uuid)
+            .order_by(desc("scores_created_timestamp"))
+            .first()
         )
 
     except:
@@ -336,3 +363,37 @@ def scores_in_db(quiz_uuid):
         return True
     else:
         return False
+
+
+def get_scores(session_id):
+    """
+    Validates that a session exists within the DB by checking the scores
+    table for the most recent scores associated with the provided session id.
+
+    Users may have multiple session IDs if they retake the quiz, so we need to
+    return the most recently created version.
+
+    Parameters:
+        session_id (uuid4 as str)
+
+    Returns: Scores entry if exists
+    Otherwise throws error
+    """
+    try:
+        scores = (
+            db.session.query(Scores)
+            .filter_by(session_uuid=session_id)
+            .order_by(desc("scores_created_timestamp"))
+            .first()
+        )
+    except:
+        raise DatabaseError(
+            message="An error occurred while querying the scores from the database."
+        )
+
+    if not scores:
+        raise InvalidUsageError(
+            "Provided session ID is not associated with any quiz scores."
+        )
+
+    return scores
