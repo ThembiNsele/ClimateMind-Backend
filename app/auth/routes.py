@@ -1,24 +1,24 @@
 from datetime import datetime, timezone
 from flask import request, jsonify, make_response
 from sqlalchemy import desc
-from app.auth import bp
+import uuid
 import regex as re
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import current_user
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import create_refresh_token
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import unset_jwt_cookies
+from flask import request, jsonify, make_response
 from flask_cors import cross_origin
-from app.subscribe.store_subscription_data import check_email
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_refresh_token
+from flask_jwt_extended import current_user
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import unset_jwt_cookies, get_jwt
 
-from app.errors.errors import InvalidUsageError, DatabaseError, UnauthorizedError
-
-from app.models import Users, Scores
+from sqlalchemy import desc
 
 from app import db, auto
-
-import uuid
+from app.auth import bp
+from app.errors.errors import InvalidUsageError, DatabaseError, UnauthorizedError
+from app.models import Users, Scores
+from app.subscribe.store_subscription_data import check_email
 
 """
 A series of endpoints for authentication.
@@ -27,9 +27,10 @@ Valid URLS to access the refresh endpoint are specified in app/__init__.py
 """
 
 
-@bp.route("/login", methods=["POST"])
+@bp.route("/login", methods=["POST", "GET"])
 @auto.doc()
 def login():
+    db.session.query(Users).one()
     """
     Logs a user in by parsing a POST request containing user credentials.
     User provides email/password.
@@ -190,8 +191,8 @@ def register():
     if not password_valid(password):
         raise InvalidUsageError(
             message="Password does not fit the requirements."
-            "Password must be between 8-20 characters and contain at least one uppercase letter, one lowercase "
-            "letter, one number and one special character."
+                    "Password must be between 8-20 characters and contain at least one uppercase letter, one lowercase "
+                    "letter, one number and one special character."
         )
 
     user = Users.find_by_username(email)
@@ -220,6 +221,47 @@ def register():
     )
     response.set_cookie("refresh_token", refresh_token, path="/refresh", httponly=True)
     return response
+
+
+@bp.route("/internal-admin-jwt-token")
+def get_admin_jwt_token():
+    fakeuser = {"uuid": "12345"}
+    admin_access_token = create_access_token(identity=fakeuser, additional_claims={"is_admin": True})
+
+    return jsonify(admin_access_token)
+
+
+@bp.route("/delete_user")
+@jwt_required()
+def delete_user():
+    if not get_jwt()["is_admin"]:
+        raise UnauthorizedError("The JWT is not a valid admin JWT")
+
+    delete_session_uuid = request.args.get("session_uuid")
+    delete_user = db.session.query(Users).join(Scores).filter(Scores.session_uuid == delete_session_uuid).one_or_none()
+    db.session.delete(delete_user)
+    db.session.commit()
+    print("deleting ", delete_session_uuid)
+
+
+def get_session_id_for_user(user):
+    try:
+        scores = (
+            db.session.query(Scores)
+                .filter_by(user_uuid=user.uuid)
+                .order_by(desc("scores_created_timestamp"))
+                .first()
+        )
+
+    except:
+        raise DatabaseError(message="Failed to query scores from the database.")
+
+    if scores:
+        session_id = scores.session_uuid
+    else:
+        session_id = None
+
+    return session_id
 
 
 def add_user_to_db(first_name, last_name, email, password, quiz_uuid):
