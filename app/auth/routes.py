@@ -278,9 +278,6 @@ def delete_user():
     Only admin accounts can access this endpoint
 
     """
-    if not get_jwt()["is_administrator"]:
-        raise UnauthorizedError("The JWT is not a valid admin JWT")
-
     delete_session_uuid = request.args.get("session_uuid")
     delete_session_uuid = uuid.UUID(delete_session_uuid)
     user_to_delete = (
