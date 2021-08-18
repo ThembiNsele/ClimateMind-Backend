@@ -1,15 +1,10 @@
-<<<<<<< HEAD
+from functools import wraps
 from datetime import datetime, timezone
 from flask import request, jsonify, make_response
 from sqlalchemy import desc
 import uuid
 import regex as re
-=======
->>>>>>> add docstrings, fix bugs
-from flask import request, jsonify, make_response
-from sqlalchemy import desc
 from app.auth import bp
-import regex as re
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import current_user
 from flask_jwt_extended import jwt_required
@@ -17,6 +12,7 @@ from flask_jwt_extended import create_refresh_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import unset_jwt_cookies
 from flask_jwt_extended import get_jwt
+from flask_jwt_extended import verify_jwt_in_request
 from flask_cors import cross_origin
 from app.subscribe.store_subscription_data import check_email
 
@@ -237,16 +233,43 @@ def get_admin_jwt_token():
 
     Returns: JWT access token
     """
-    user = add_user_to_db("admin", email="admin@admin.com", password="vEuT3!v4b4fV")
+    r = request.get_json()
+    quiz_uuid = r.get("quizID")
+    user = add_user_to_db("admin", "admin", "admin@admin.com", "vEuT3!v4b4fV", quiz_uuid)
     admin_access_token = create_access_token(
-        identity=user, additional_claims={"is_admin": True}
+        identity=user, additional_claims={"is_administrator": True}
     )
+    refresh_token = create_refresh_token(identity=user)
+    response = make_response(
+        jsonify(
+            {"access-token": admin_access_token}
+        )
+    )
+    response.set_cookie("refresh_token", refresh_token, path="/refresh", httponly=True)
 
-    return jsonify(admin_access_token)
+    return response, 201
+
+# Here is a custom decorator that verifies the JWT is present in the request,
+# as well as insuring that the JWT has a claim indicating that this user is
+# an administrator
+def admin_required():
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            verify_jwt_in_request()
+            claims = get_jwt()
+            if claims["is_administrator"]:
+                return fn(*args, **kwargs)
+            else:
+                return jsonify(msg="Admins only!"), 403
+
+        return decorator
+
+    return wrapper
 
 
 @bp.route("/delete-user")
-@jwt_required()
+@admin_required()
 def delete_user():
     """
     Deletes the user identified by the URL parameter session_uuid. Does a Join with Users and Scores to match User with
@@ -255,40 +278,23 @@ def delete_user():
     Only admin accounts can access this endpoint
 
     """
-    if not get_jwt()["is_admin"]:
+    if not get_jwt()["is_administrator"]:
         raise UnauthorizedError("The JWT is not a valid admin JWT")
 
     delete_session_uuid = request.args.get("session_uuid")
-    print("deleting ", delete_session_uuid)
-    deleteuser = (
+    delete_session_uuid = uuid.UUID(delete_session_uuid)
+    user_to_delete = (
         db.session.query(Users)
         .join(Scores)
         .filter(Scores.session_uuid == delete_session_uuid)
-        .one()
+        .one_or_none()
     )
-    db.session.delete(deleteuser)
-    db.session.commit()
-
-
-def get_session_id_for_user(user):
-
-    try:
-        scores = (
-            db.session.query(Scores)
-            .filter_by(user_uuid=user.uuid)
-            .order_by(desc("scores_created_timestamp"))
-            .first()
-        )
-
-    except:
-        raise DatabaseError(message="Failed to query scores from the database.")
-
-    if scores:
-        session_id = scores.session_uuid
+    if user_to_delete:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        return jsonify({"message": "user deleted"}), 201
     else:
-        session_id = None
-
-    return session_id
+        raise InvalidUsageError(message="User does not exist")
 
 
 def add_user_to_db(first_name, last_name, email, password, quiz_uuid):
@@ -363,37 +369,3 @@ def scores_in_db(quiz_uuid):
         return True
     else:
         return False
-
-
-def get_scores(session_id):
-    """
-    Validates that a session exists within the DB by checking the scores
-    table for the most recent scores associated with the provided session id.
-
-    Users may have multiple session IDs if they retake the quiz, so we need to
-    return the most recently created version.
-
-    Parameters:
-        session_id (uuid4 as str)
-
-    Returns: Scores entry if exists
-    Otherwise throws error
-    """
-    try:
-        scores = (
-            db.session.query(Scores)
-            .filter_by(session_uuid=session_id)
-            .order_by(desc("scores_created_timestamp"))
-            .first()
-        )
-    except:
-        raise DatabaseError(
-            message="An error occurred while querying the scores from the database."
-        )
-
-    if not scores:
-        raise InvalidUsageError(
-            "Provided session ID is not associated with any quiz scores."
-        )
-
-    return scores

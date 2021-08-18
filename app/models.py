@@ -33,6 +33,7 @@ class Users(db.Model):
     first_name = db.Column(db.String(50), index=False, unique=False, nullable=False)
     last_name = db.Column(db.String(50), index=False, unique=False, nullable=False)
     quiz_uuid = db.Column(UNIQUEIDENTIFIER, db.ForeignKey("scores.quiz_uuid"))
+    is_admin = db.Column(db.Boolean, index=False, unique=False, default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
