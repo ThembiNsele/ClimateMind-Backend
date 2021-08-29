@@ -7,26 +7,13 @@ var faker = require("faker");
 let session_Id;
 let set_one_quizId;
 let set_two_quizId;
-//let Zip_Code;
-let user1;
-let user2;
-let user3;
-let user4;
-let user5;
-let user6;
-let user7;
+let user;
 const successMessage = "Successfully created user";
 const badReqMessage1 = "Email and password must be included in the request body";
 const alreadyRegisteredMessage = "Email already registered";
 const badReqMessage2 = "Email and password must be included in the request body.";
 const missingName = "Name is missing.";
-//const missingQuizId = "Quiz UUID must be included to register.";
-//const missingQuizId = "QUIZ_UUID is required.";
 const invalidQuizId = "Quiz ID is not a valid UUID4 format.";
-const rateLimitPerSecond = "ratelimit exceeded 5 per 1 second";
-const rateLimitPerMinute = "ratelimit exceeded 10 per 1 minute";
-const rateLimitPerHour = "ratelimit exceeded 50 per 1 hour";
-const rateLimitPerDay = "ratelimit exceeded 100 per 1 day";
 
 
 describe("'/register' endpoint", () => {
@@ -44,7 +31,7 @@ describe("'/register' endpoint", () => {
     });
 
     it("should register a user", () => {
-        user1 = {
+        user = {
             firstName: faker.name.firstName(),
             lastName: faker.name.lastName(),
             email: faker.internet.email(),
@@ -52,7 +39,8 @@ describe("'/register' endpoint", () => {
             quizId: set_one_quizId
         };
         
-        cy.registerEndpoint(user1).should((response) => {
+        cy.registerEndpoint(user).should((response) => {
+            expect(response.status).to.equal(201);
             expect(response.headers["content-type"]).to.equal(
                 "application/json"
             );
@@ -60,43 +48,16 @@ describe("'/register' endpoint", () => {
                 "http://0.0.0.0:3000"
             );
             expect(response.body).to.be.a("object");
-
-            if (response.status == 201) {
-
-                expect(response.status).to.equal(201);
-                expect(response.body).to.have.property("message");
-                expect(response.body.message).to.satisfy(function (s) {
-                    return s === successMessage;
-                });
-
-            } else {
-                expect(response.status).to.equal(429);
-                expect(response.body).to.have.property("error");
-                let errorMessage = response.body;
-                if (JSON.stringify(errorMessage).includes("5 per 1 second")) {
-                    expect(response.body.error).to.satisfy(function (s) {
-                        return s === rateLimitPerSecond;
-                    });
-                } else if (JSON.stringify(errorMessage).includes("10 per 1 minute")) {
-                    expect(response.body.error).to.satisfy(function (s) {
-                        return s === rateLimitPerMinute;
-                    });
-                } else if (JSON.stringify(errorMessage).includes("50 per 1 hour")) {
-                    expect(response.body.error).to.satisfy(function (s) {
-                        return s === rateLimitPerHour;
-                    });
-                }
-                expect(response.body.error).to.satisfy(function (s) {
-                    return s === rateLimitPerDay;
-                });
-            }
-
+            expect(response.body).to.have.property("message");
+            expect(response.body.message).to.satisfy(function (s) {
+                return s === successMessage;
+            });
         });
 
     });
 
     it("should register another user", () => {
-        user2 = {
+        user = {
             firstName: faker.name.firstName(),
             lastName: faker.name.lastName(),
             email: faker.internet.email(),
@@ -104,7 +65,7 @@ describe("'/register' endpoint", () => {
             quizId: set_one_quizId
         };
 
-        cy.registerEndpoint(user2).should((response) => {
+        cy.registerEndpoint(user).should((response) => {
             expect(response.status).to.equal(201);
             expect(response.headers["content-type"]).to.equal(
                 "application/json"
@@ -121,7 +82,7 @@ describe("'/register' endpoint", () => {
     });
 
     it("should handle if the user already exists", () => {
-        user2 = {
+        user = {
             firstName: faker.name.firstName(),
             lastName: faker.name.lastName(),
             email: faker.internet.email(),
@@ -129,8 +90,8 @@ describe("'/register' endpoint", () => {
             quizId: set_two_quizId
         };
 
-        cy.registerEndpoint(user2).then(() => {
-            cy.registerEndpoint(user2).should((response) => {
+        cy.registerEndpoint(user).then(() => {
+            cy.registerEndpoint(user).should((response) => {
                 expect(response.status).to.equal(401);
                 expect(response.headers["content-type"]).to.equal("application/json");
                 expect(response.body).to.be.a("object");
@@ -143,14 +104,14 @@ describe("'/register' endpoint", () => {
     });
 
     it("should handle a missing email", () => {
-        user3 = {
+        user = {
             firstName: faker.name.firstName(),
             lastName: faker.name.lastName(),
             password: faker.internet.password(),
             quizId: set_one_quizId
         };
 
-        cy.registerEndpoint(user3).should((response) => {
+        cy.registerEndpoint(user).should((response) => {
             expect(response.status).to.equal(400);
             expect(response.headers["content-type"]).to.equal("application/json");
             expect(response.body).to.be.a("object");
@@ -164,14 +125,14 @@ describe("'/register' endpoint", () => {
     });
 
     it("should handle a missing password", () => {
-        user4 = {
+        user = {
             firstName: faker.name.firstName(),
             lastName: faker.name.lastName(),
             email: faker.internet.email(),
             quizId: set_one_quizId
         };
         
-        cy.registerEndpoint(user4).should((response) => {
+        cy.registerEndpoint(user).should((response) => {
             expect(response.status).to.equal(400);
             expect(response.headers["content-type"]).to.equal("application/json");
             expect(response.body).to.be.a("object");
@@ -196,14 +157,14 @@ describe("'/register' endpoint", () => {
     });
 
     it("should handle a missing firstName", () => {
-        user5 = {
+        user = {
             lastName: faker.name.lastName(),
             email: faker.internet.email(),
             password: faker.internet.password(),
             quizId: set_one_quizId
         };
             
-        cy.registerEndpoint(user5).should((response) => {
+        cy.registerEndpoint(user).should((response) => {
             expect(response.status).to.equal(400);
             expect(response.headers["content-type"]).to.equal("application/json");
             expect(response.body).to.be.a("object");
@@ -216,14 +177,14 @@ describe("'/register' endpoint", () => {
     });
 
     it("should handle a missing lastName", () => {
-        user6 = {
+        user = {
             firstName: faker.name.firstName(),
             email: faker.internet.email(),
             password: faker.internet.password(),
             quizId: set_one_quizId
         };
         
-        cy.registerEndpoint(user6).should((response) => {
+        cy.registerEndpoint(user).should((response) => {
             expect(response.status).to.equal(400);
             expect(response.headers["content-type"]).to.equal("application/json");
             expect(response.body).to.be.a("object");
@@ -236,14 +197,14 @@ describe("'/register' endpoint", () => {
     });
 
     it("should handle a missing quizId", () => {
-        user7 = {
+        user = {
             firstName: faker.name.firstName(),
             lastName: faker.name.lastName(),
             email: faker.internet.email(),
             password: faker.internet.password()
         };
         
-        cy.registerEndpoint(user7).should((response) => {
+        cy.registerEndpoint(user).should((response) => {
             expect(response.status).to.equal(400);
             expect(response.headers["content-type"]).to.equal("application/json");
             expect(response.body).to.be.a("object");
